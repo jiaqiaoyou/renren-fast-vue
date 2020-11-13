@@ -1,10 +1,6 @@
 <template>
-  <div
-    class="site-wrapper"
-    :class="{ 'site-sidebar--fold': sidebarFold }"
-    v-loading.fullscreen.lock="loading"
-    element-loading-text="拼命加载中">
-    <template v-if="!loading">
+  <div>
+    <template>
       <main-navbar />
       <main-sidebar />
       <div class="site-content__wrapper" :style="{ 'min-height': documentClientHeight + 'px' }">
@@ -12,6 +8,18 @@
       </div>
     </template>
   </div>
+<!--  <div-->
+<!--    class="site-wrapper" :class="{ 'site-sidebar&#45;&#45;fold': sidebarFold }"-->
+<!--    v-loading.fullscreen.lock="loading"-->
+<!--    element-loading-text="拼命加载中">-->
+<!--    <template v-if="!loading">-->
+<!--      <main-navbar />-->
+<!--      <main-sidebar />-->
+<!--      <div class="site-content__wrapper" :style="{ 'min-height': documentClientHeight + 'px' }">-->
+<!--        <main-content v-if="!$store.state.common.contentIsNeedRefresh" />-->
+<!--      </div>-->
+<!--    </template>-->
+<!--  </div>-->
 </template>
 
 <script>
@@ -74,14 +82,14 @@
       // 获取当前管理员信息
       getUserInfo () {
         this.$http({
-          url: this.$http.adornUrl('/sys/user/info'),
+          url: this.$http.adornUrl('/user/me'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 200) {
             this.loading = false
-            this.userId = data.user.userId
-            this.userName = data.user.username
+            this.userId = data.id
+            this.userName = data.name
           }
         })
       }

@@ -503,7 +503,7 @@ var navDataList = [
 export function nav () {
   return {
     // isOpen: false,
-    url: '/sys/menu/nav',
+    url: '/artilce',
     type: 'get',
     data: {
       'msg': 'success',

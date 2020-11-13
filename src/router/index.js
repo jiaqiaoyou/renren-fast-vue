@@ -45,6 +45,9 @@ const mainRoutes = {
       next({ name: 'login' })
     }
     next()
+    console.log(to)
+    console.log(from)
+    console.log(next)
   }
 }
 
@@ -63,7 +66,7 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     http({
-      url: http.adornUrl('/sys/menu/nav'),
+      url: http.adornUrl('/article'),
       method: 'get',
       params: http.adornParams()
     }).then(({data}) => {

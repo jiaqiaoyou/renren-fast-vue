@@ -7,29 +7,80 @@
         :collapseTransition="false"
         class="site-sidebar__menu">
         <el-menu-item index="home" @click="$router.push({ name: 'home' })">
-          <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">首页</span>
         </el-menu-item>
-        <el-submenu index="demo">
+
+        <el-submenu index="club">
           <template slot="title">
-            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
-            <span>demo</span>
+            <span>社团</span>
           </template>
-          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'demo-echarts' })">
-            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">echarts</span>
+          <el-menu-item index="club-create">
+            <span>创建社团</span>
           </el-menu-item>
-          <el-menu-item index="demo-ueditor" @click="$router.push({ name: 'demo-ueditor' })">
-            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">ueditor</span>
+          <el-menu-item index="club-check">
+            <span>社团总览</span>
+          </el-menu-item>
+          <el-menu-item index="club-mine">
+            <span>我的社团</span>
           </el-menu-item>
         </el-submenu>
+
+        <el-submenu index="article">
+          <template slot="title">
+            <span>文章</span>
+          </template>
+          <el-menu-item index="article-create">
+            <span>编写文章</span>
+          </el-menu-item>
+          <el-menu-item index="article-check">
+            <span>文章总览</span>
+          </el-menu-item>
+          <el-menu-item index="article-mine">
+            <span>我的文章</span>
+          </el-menu-item>
+        </el-submenu>
+
+
+        <el-submenu index="msg">
+          <template slot="title">
+            <span>消息</span>
+          </template>
+          <el-menu-item index="msg-mine">
+            <span>我的消息</span>
+          </el-menu-item>
+        </el-submenu>
+
+        <el-submenu index="review">
+          <template slot="title">
+            <span>评论</span>
+          </template>
+          <el-menu-item index="review-mine">
+            <span>我的评论</span>
+          </el-menu-item>
+        </el-submenu>
+
+
+
+        <el-submenu index="demo">
+          <template slot="title">
+            <span>菜单</span>
+          </template>
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'demo-echarts' })">
+            <span slot="title">社团</span>
+          </el-menu-item>
+          <el-menu-item index="demo-ueditor" @click="$router.push({ name: 'demo-ueditor' })">
+            <span slot="title">文章</span>
+          </el-menu-item>
+        </el-submenu>
+
+
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"
           :menu="menu"
           :dynamicMenuRoutes="dynamicMenuRoutes">
         </sub-menu>
+
       </el-menu>
     </div>
   </aside>
