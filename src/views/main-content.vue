@@ -15,6 +15,7 @@
           <el-dropdown-item @click.native="tabsCloseAllHandle">关闭全部标签页</el-dropdown-item>
           <el-dropdown-item @click.native="refresh()">刷新当前标签页</el-dropdown-item>
         </el-dropdown-menu>
+
       </el-dropdown>
       <el-tab-pane
         v-for="item in mainTabs"

@@ -25,7 +25,6 @@
 </template>
 
 <script>
-  import { getUUID } from '@/utils'
   export default {
     data () {
       return {
