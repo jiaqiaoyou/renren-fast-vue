@@ -1,15 +1,13 @@
 <template>
   <div v-loading.fullscreen.lock="loading" element-loading-text="拼命加载中">
     <div>
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submit()" status-icon>
-        <el-form-item prop="name">
+      <el-form>
+        <el-form-item @keyup.enter.native="submit">
           <el-tag>标题</el-tag>
-          <el-input placeholder="请输入文章标题"
-                    v-model="dataForm.name"
-                    clearable/>
+          <el-input v-model="dataForm.name" @change="this.$forceUpdate"/>
         </el-form-item>
 
-        <el-form-item prop="context">
+        <el-form-item>
           <el-tag>正文</el-tag>
           <div id="demo1"></div>
         </el-form-item>
@@ -29,7 +27,7 @@
 
 
         <el-form-item>
-          <el-button type="primary" @click="submit()">发布</el-button>
+          <el-button type="primary" @click="submit()">编辑</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -43,25 +41,25 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.getClubs()
+      vm.getData()
     })
   },
   created () {
     this.configEditor()
     this.getClubs()
+    this.getData()
   },
   mounted () {
     this.configEditor()
     this.getClubs()
+    this.getData()
   },
   data () {
     return {
       editor: null,
       loading: true,
-      dataForm: {},
-      dataRule: {
-        name: [
-          {required: true, message: '文章标题不能为空', trigger: blur}
-        ]
+      dataForm: {
+        'name': ''
       },
       clubs: [],
       club_options: []
@@ -75,28 +73,36 @@ export default {
       this.editor = editor
     },
     submit () {
-      this.$refs['dataForm'].validate((valid) => {
-        console.log(valid)
-        if (valid) {
-          console.log(this.club_options)
-          console.log(this.clubs)
-          this.$http({
-            url: this.$http.adornUrl('/article'),
-            method: 'post',
-            data: this.$http.adornData({
-              'name': this.dataForm.name,
-              'context': this.editor.txt.html(),
-              'tag_clubs_dict': this.clubs
-            })
-          }).then(({data}) => {
-            if (data && data.code === 200) {
-              this.dataForm = {}
-              this.editor.txt.html('')
-              this.$notify.success('创建成功')
-              this.$router.push('/show_article_list/?me=1')
-            }
-          })
+      this.$http({
+        url: this.$http.adornUrl('/article/' + this.$route.params.id),
+        method: 'put',
+        data: this.$http.adornData({
+          'name': this.dataForm.name,
+          'context': this.editor.txt.html(),
+          'tag_clubs_dict': this.clubs
+        })
+      }).then(({data}) => {
+        if (data && data.code === 200) {
+          this.$notify.success('编辑成功')
+          this.$router.replace('/show_article/' + this.$route.params.id)
         }
+      })
+    },
+    getData () {
+      this.$http({
+        url: this.$http.adornUrl('/article/' + this.$route.params.id),
+        method: 'get'
+      }).then(({data}) => {
+        // eslint-disable-next-line camelcase
+        let tag_ids = []
+        for (let i = 0; i < data.tag_clubs.length; i++) {
+          tag_ids.push(data.tag_clubs[i].id)
+        }
+        this.dataForm.name = data.name
+        this.editor.txt.html(data.context)
+        // eslint-disable-next-line camelcase
+        this.clubs = tag_ids
+        this.loading = false
       })
     },
     getClubs () {
@@ -110,9 +116,7 @@ export default {
         })
       }).then(({data}) => {
         if (data && data.code === 200) {
-          this.loading = false
           this.club_options = data.clubs
-          this.total = data.total
         }
       })
     }

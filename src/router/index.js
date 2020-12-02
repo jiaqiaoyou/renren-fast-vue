@@ -42,10 +42,21 @@ const mainRoutes = {
       meta: {'title': '社团总览'}
     },
     {
+      path: '/create_message',
+      component: _import('common/create_message'),
+      name: 'create_message',
+      meta: {title: '发送邮件'},
+    },
+    {
       path: '/show_club_list_me',
       component: _import('common/show_club_list_me'),
       name: 'show_club_list_me',
       meta: {title: '我的社团'}
+    },
+    {
+      path: '/about_me',
+      component: _import('common/about_me'),
+      name: 'about_me',
     },
     {
       path: '/create_article',
@@ -132,10 +143,55 @@ const mainRoutes = {
       meta: {title: 'show single club'}
     },
     {
+      path: '/show_user/:id',
+      component: _import('common/show_user'),
+      name: 'show_user',
+    },
+    {
+      path: '/show_message/:id',
+      component: _import('common/show_message'),
+      name: 'show_message'
+    },
+    {
       path: '/demo-echarts',
       component: _import('demo/echarts'),
       name: 'demo-echarts',
       meta: {title: 'demo-echarts', isTab: true}
+    },
+    {
+      path: '/show_article/:id',
+      component: _import('common/show_article'),
+      name: 'show_article'
+    },
+    {
+      path: '/add_member/:id',
+      component: _import('common/add_member'),
+      name: 'add_member'
+    },
+    {
+      path: '/comments_zone/:id',
+      component: _import('common/comments_zone'),
+      name: 'comments_zone'
+    },
+    {
+      path: '/comment_detail/:id',
+      component: _import('common/comment_detail'),
+      name: 'comment_detail'
+    },
+    {
+      path: '/edit_club/:id',
+      component: _import('common/edit_club'),
+      name: 'edit_club'
+    },
+    {
+      path: '/edit_me',
+      component: _import('common/edit_me'),
+      name: 'edit_me'
+    },
+    {
+      path: '/edit_article/:id',
+      component: _import('common/edit_article'),
+      name: 'edit_article'
     },
     {
       path: '/demo-ueditor',

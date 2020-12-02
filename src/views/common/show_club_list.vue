@@ -13,27 +13,12 @@
           prop="owner.name">
         </el-table-column>
 
-        <el-table-column
-          label="描述"
-          prop="description">
-
-        </el-table-column>
-
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleCheck(scope.row.id)">查看/修改
+              @click="handleCheck(scope.row.id)">查看
             </el-button>
-          </template>
-        </el-table-column>
-
-        <el-table-column align="right">
-          <template slot="header" slot-scope="scope">
-            <el-input
-              v-model="search"
-              size="text"
-              placeholder="输入关键字搜索"/>
           </template>
         </el-table-column>
 
@@ -53,8 +38,6 @@
 </template>
 
 <script>
-import AddOrUpdate from '../modules/sys/user-add-or-update'
-
 export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
@@ -62,40 +45,16 @@ export default {
     })
   },
   created () {
-    if (this.$store.state.clubs_update === undefined) {
-      this.$store.state.clubs_update = 0
-    }
-    console.log(this.$store.state.clubs_update)
     this.getClubList()
-    this.reload()
-  },
-  components: {
-    AddOrUpdate
   },
   data () {
     return {
-      addOrUpdateVisible: false,
       tableData: [],
       search: '',
       loading: true,
       offset: 1,
       limit: 10,
       total: undefined,
-      AddOrUpdate: false
-    }
-  },
-  comments: {
-    AddOrUpdate
-  },
-  computed: {
-    clubs_update () {
-      return this.$store.state.clubs_update
-    }
-  },
-  watch: {
-    clubs_update: function (newVal, oldVal) {
-      console.log('trigger')
-      this.getClubList()
     }
   },
   methods: {
@@ -106,7 +65,7 @@ export default {
         params: this.$http.adornParams({
           'limit': this.limit,
           'offset': this.offset,
-          'me': 0
+          'me': this.$route.query.me ? 1 : 0
         })
       }).then(({data}) => {
         console.log(data)
@@ -117,9 +76,6 @@ export default {
           this.total = data.total
         }
       })
-    },
-    handleJoin (index, row) {
-      console.log(index, row)
     },
     handleCheck (id) {
       this.$router.push('/show_single_club/' + id)

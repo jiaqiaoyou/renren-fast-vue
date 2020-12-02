@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量踢出</el-button>
+        <el-button type="danger" @click="kickHandle()" :disabled="dataListSelections.length <= 0">批量踢出</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -51,28 +51,39 @@
         align="center"
         label="角色">
       </el-table-column>
+
       <el-table-column
-        fixed="right"
-        header-align="center"
-        align="center"
-        width="150"
         label="操作">
+
         <template slot-scope="scope">
 
           <el-button type="text" size="small"
-                     @click="checkUserHandle(scope.row.userId)">
+                     @click="checkUserHandle(scope.row.id)">
             查看
           </el-button>
 
           <el-button type="text" size="small"
-                     @click="sendMessageHandle(scope.row.id)">
+                     @click="sendMessageHandle(scope.row.school_number)">
             发消息
           </el-button>
+
+          <el-dialog
+            title="提示"
+            :visible.sync="out_confirm"
+            width="30%">
+            <span>确定踢出？</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="out_confirm=false">取消</el-button>
+                <el-button type="primary" @click="kickHandle(scope.row.id)">确定</el-button>
+              </span>
+          </el-dialog>
+
           <el-button type="text"
                      size="small"
-                     @click="deleteHandle(scope.row.userId)">
+                     @click="out_confirm=true">
             踢出
           </el-button>
+
 
         </template>
       </el-table-column>
@@ -88,12 +99,10 @@
     </el-pagination>
 
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-
   </div>
 </template>
 
 <script>
-import AddOrUpdate from '../modules/sys/user-add-or-update'
 
 export default {
   beforeRouteEnter (to, from, next) {
@@ -106,7 +115,10 @@ export default {
   },
   data () {
     return {
+      loading: true,
+      out_confirm: false,
       id: undefined,
+      editor: null,
       dataForm: {
         userName: ''
       },
@@ -118,9 +130,6 @@ export default {
       dataListSelections: [],
       addOrUpdateVisible: false
     }
-  },
-  components: {
-    AddOrUpdate
   },
   activated () {
     this.getDataList()
@@ -161,14 +170,36 @@ export default {
         this.$refs.addOrUpdate.init(id)
       })
     },
-    deleteHandle (id) {
-      console.log('delete')
+    // eslint-disable-next-line camelcase
+    kickHandle (user_id) {
+      this.id = this.$route.params.id
+      this.$http({
+        url: this.$http.adornUrl('/club/' + this.id),
+        method: 'put',
+        params: this.$http.adornParams({
+          'kick': 1
+        }),
+        data: this.$http.adornData({
+          'user_id': user_id
+        })
+      }).then(({data}) => {
+        if (data && data.code === 200) {
+          this.out_confirm = false
+          this.getDataList()
+        }
+      })
     },
     checkUserHandle (id) {
-      console.log('check')
+      this.$router.push('/show_user/' + id)
     },
-    sendMessageHandle (id) {
-      console.log('send')
+    sendMessageHandle (school_number) {
+      this.$router.push('/create_message/?school_numbers=' + school_number)
+    },
+    handleOut_ () {
+      this.out_confirm = true
+    },
+    _handleOut_ () {
+      this.out_confirm = false
     }
   }
 }

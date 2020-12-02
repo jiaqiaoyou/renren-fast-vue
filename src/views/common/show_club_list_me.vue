@@ -25,13 +25,6 @@
           prop="owner.name">
         </el-table-column>
 
-        <el-table-column
-          label="描述"
-          prop="description">
-
-        </el-table-column>
-
-
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
@@ -58,15 +51,6 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="right">
-          <template slot="header" slot-scope="scope">
-            <el-input
-              v-model="search"
-              size="mini"
-              placeholder="输入关键字搜索"/>
-          </template>
-
-        </el-table-column>
 
       </el-table>
       <el-pagination

@@ -20,7 +20,7 @@
           <el-menu-item index="club-check" @click="$router.push({ name: 'show_club_list'})">
             <span>社团总览</span>
           </el-menu-item>
-          <el-menu-item index="club-mine" @click="$router.push({ name: 'show_club_list_me'})">
+          <el-menu-item index="club-mine" @click="$router.push({name:'show_club_list_me'})">
             <span>我的社团</span>
           </el-menu-item>
         </el-submenu>
@@ -43,42 +43,33 @@
 
         <el-submenu index="msg">
           <template slot="title">
-            <span>我的消息</span>
+            <span>邮箱</span>
           </template>
+          <el-menu-item index="msg-mine" @click="$router.push({name:'create_message'})">
+            <span>写邮件</span>
+          </el-menu-item>
           <el-menu-item index="msg-mine" @click="$router.push({name:'my_message_receive'})">
-            <span>接受的消息</span>
+            <span>已接收</span>
           </el-menu-item>
           <el-menu-item index="msg-mine" @click="$router.push({name:'my_message_send'})">
-            <span>发送的消息</span>
+            <span>已发送</span>
           </el-menu-item>
         </el-submenu>
 
-        <el-submenu index="review">
+        <el-submenu>
           <template slot="title">
-            <span>评论</span>
+            <span>个人</span>
           </template>
-          <el-menu-item index="review-mine" @click="$router.push({name:'my_comment'})">
-            <span>我的评论</span>
+          <el-menu-item @click="$router.push('/about_me')">
+            <span>关于我</span>
           </el-menu-item>
-          <el-menu-item index="review-mine" @click="$router.push({name:'receive_comment'})">
-            <span>回复我的</span>
+          <el-menu-item @click="$router.push('/edit_me')">
+            <span>修改个人信息</span>
+          </el-menu-item>
+          <el-menu-item @click="logoutHandle">
+            <span>登出</span>
           </el-menu-item>
         </el-submenu>
-
-
-        <!--        <el-submenu index="demo">-->
-        <!--          <template slot="title">-->
-        <!--            <span>菜单</span>-->
-        <!--          </template>-->
-        <!--          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'demo-echarts' })">-->
-        <!--            <span slot="title">社团</span>-->
-        <!--          </el-menu-item>-->
-        <!--          <el-menu-item index="demo-ueditor" @click="$router.push({ name: 'demo-ueditor' })">-->
-        <!--            <span slot="title">文章</span>-->
-        <!--          </el-menu-item>-->
-        <!--        </el-submenu>-->
-
-
         <sub-menu
           v-for="menu in menuList"
           :key="menu.menuId"
@@ -94,6 +85,7 @@
 <script>
 import SubMenu from './main-sidebar-sub-menu'
 import {isURL} from '@/utils/validate'
+import {clearLoginInfo} from '../utils'
 
 export default {
   data () {
@@ -157,6 +149,25 @@ export default {
     this.routeHandle(this.$route)
   },
   methods: {
+    logoutHandle () {
+      this.$confirm(`确定进行[退出]操作?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/user/logout'),
+          method: 'post',
+          data: this.$http.adornData()
+        }).then(({data}) => {
+          if (data && data.code === 200) {
+            clearLoginInfo()
+            this.$router.push({name: 'login'})
+          }
+        })
+      }).catch(() => {
+      })
+    },
     // 路由操作
     routeHandle (route) {
       if (route.meta.isTab) {

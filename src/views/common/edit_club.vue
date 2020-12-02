@@ -25,7 +25,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submit()">{{ button_name }}</el-button>
+        <el-button type="primary" @click="submit()">编辑</el-button>
       </el-form-item>
 
     </el-form>
@@ -48,19 +48,9 @@ export default {
   mounted () {
     this.configEditor()
     this.getData()
-    // // eslint-disable-next-line new-cap
-    // const editor = new wangEditor(`#demo1`)
-    // // 配置 onchange 回调函数，将数据同步到 vue 中
-    // editor.config.onchange = (newHtml) => {
-    //   this.editorData = newHtml
-    // }
-    // // 创建编辑器
-    // editor.create()
-    // this.editor = editor
   },
   data () {
     return {
-      button_name: '创建',
       editor: null,
       update: false,
       success_visible: false,
@@ -77,22 +67,16 @@ export default {
   },
   methods: {
     getData () {
-      if (this.$route.query.edit_id) {
-        this.button_name = '编辑'
+      // eslint-disable-next-line camelcase
+      let club_id = this.$route.params.id
+      this.$http({
         // eslint-disable-next-line camelcase
-        let club_id = this.$route.query.edit_id
-        this.$http({
-          // eslint-disable-next-line camelcase
-          url: this.$http.adornUrl('/club/' + club_id),
-          method: 'get'
-        }).then(({data}) => {
-          this.dataForm.name = data.name
-          this.editor.txt.html(data.description)
-        })
-      } else {
-        this.dataForm.name = ''
-        this.editor.txt.html('')
-      }
+        url: this.$http.adornUrl('/club/' + club_id),
+        method: 'get'
+      }).then(({data}) => {
+        this.dataForm.name = data.name
+        this.editor.txt.html(data.description)
+      })
     },
     configEditor () {
       // eslint-disable-next-line new-cap
@@ -105,8 +89,8 @@ export default {
         console.log(valid)
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl('/club'),
-            method: 'post',
+            url: this.$http.adornUrl('/club/'+this.$route.params.id),
+            method: 'put',
             data: this.$http.adornData({
               'name': this.dataForm.name,
               'description': this.editor.txt.html()
@@ -115,8 +99,8 @@ export default {
             console.log(' then ')
             // console.log(data)
             if (data && data.code === 200) {
-              this.$notify.success('创建成功')
-              this.$router.push('show_club_list_me')
+              this.$notify.success('编辑成功')
+              this.$router.push('/show_club_list_me')
             } else {
               this.$message.error('error')
             }
@@ -146,7 +130,9 @@ export default {
         }
       })
     }
+
   }
+
 }
 </script>
 

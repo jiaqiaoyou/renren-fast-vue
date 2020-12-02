@@ -4,8 +4,10 @@
       <el-table :data="tableData" style="width: 100%">
 
         <el-table-column
-          label="内容"
-          prop="context">
+          label="内容">
+          <template slot-scope="scope">
+            <el-button type="text" @>{{ scope.row.context }}</el-button>
+          </template>
         </el-table-column>
 
         <el-table-column
@@ -36,7 +38,15 @@
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleCheck(scope.$index, scope.row)">查看
+              @click="handleCheck(scope.row.article.id)">查看原文章
+            </el-button>
+
+            <el-dialog>
+              <el-input
+            </el-dialog>
+            <el-button
+              size="mini"
+              @click="handleReply(scope.row.id)">回复
             </el-button>
           </template>
         </el-table-column>
@@ -64,6 +74,9 @@ export default {
   },
   data () {
     return {
+      reply_visible: false,
+      reply_name: '',
+      reply_context: '',
       tableData: [],
       search: '',
       loading: true,
@@ -95,8 +108,8 @@ export default {
     handleJoin (index, row) {
       console.log(index, row)
     },
-    handleCheck (index, row) {
-      console.log(index, row)
+    handleCheck (id) {
+      this.$router.push('/show_article/' + id)
     },
     handleSizeChange (val) {
       this.limit = val
@@ -106,6 +119,12 @@ export default {
     handleCurrentChange (val) {
       this.offset = val
       this.getClubList()
+    },
+    handleReply (id) {
+
+    },
+    reply () {
+
     }
   }
 }

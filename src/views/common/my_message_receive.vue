@@ -9,27 +9,24 @@
         </el-table-column>
 
         <el-table-column
-          label="正文"
-          prop="context">
-
-        </el-table-column>
-
-        <el-table-column
           label="发送者"
           prop="sender.name">
         </el-table-column>
 
 
         <el-table-column
-          label="描述"
-          prop="description">
-
-        </el-table-column>
-
-        <el-table-column
           label="接收时间"
           prop="created">
 
+        </el-table-column>
+
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              @click="handleCheck(scope.row.id)">查看
+            </el-button>
+          </template>
         </el-table-column>
 
         <el-table-column align="right">
@@ -38,12 +35,6 @@
               v-model="search"
               size="mini"
               placeholder="输入关键字搜索"/>
-          </template>
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="handleCheck(scope.$index, scope.row)">查看
-            </el-button>
           </template>
         </el-table-column>
 
@@ -64,12 +55,17 @@
 
 <script>
 export default {
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.getMessageList()
+    })
+  },
   created () {
-    this.getArticleList()
-    this.reload()
+    this.getMessageList()
   },
   data () {
     return {
+      reply: 0,
       tableData: [
         {
           'name': 'a1',
@@ -82,18 +78,20 @@ export default {
       loading: true,
       offset: 1,
       limit: 10,
-      total: undefined,
+      total: undefined
     }
   },
   methods: {
-    getArticleList () {
+    getMessageList () {
+      this.reply = this.$route.query.reply
       this.$http({
         url: this.$http.adornUrl('/msg'),
         method: 'get',
         params: this.$http.adornParams({
           'limit': this.limit,
           'offset': this.offset,
-          'receive': 1
+          'receive': 1,
+          'reply': this.reply
         })
       }).then(({data}) => {
         console.log(data)
@@ -108,8 +106,8 @@ export default {
     handleJoin (index, row) {
       console.log(index, row)
     },
-    handleCheck (index, row) {
-      console.log(index, row)
+    handleCheck (id) {
+      this.$router.push('/show_message/' + id)
     },
     handleSizeChange (val) {
       this.limit = val

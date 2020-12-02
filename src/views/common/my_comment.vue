@@ -4,8 +4,10 @@
       <el-table :data="tableData" style="width: 100%">
 
         <el-table-column
-          label="内容"
-          prop="context">
+          label="内容">
+          <template slot-scope="scope">
+            <el-button type="text" @>{{ scope.row.context }}</el-button>
+          </template>
         </el-table-column>
 
 
@@ -31,8 +33,33 @@
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleCheck(scope.$index, scope.row)">查看
+              @click="handleCheck(scope.row.article.id)">查看原文章
             </el-button>
+
+            <el-dialog
+              title="回复"
+              :visible.sync="reply_visible"
+              width="80%">
+              <el-form>
+                <el-form-item>
+                  <el-input placeholder='请输入回复内容'
+                            v-model="reply_context"
+                            type="textarea"
+                            :autosize="{minRows:10,max:20}"
+                            clearable/>
+                </el-form-item>
+                <br>
+                <el-form-item>
+                  <el-button type="primary" @click="reply()">发送</el-button>
+                </el-form-item>
+              </el-form>
+            </el-dialog>
+
+            <el-button
+              size="mini"
+              @click="reply_visible=true">回复
+            </el-button>
+
           </template>
         </el-table-column>
 
@@ -59,6 +86,9 @@ export default {
   },
   data () {
     return {
+      reply_visible: false,
+      reply_name: '',
+      reply_context: '',
       tableData: [],
       search: '',
       loading: true,
@@ -90,8 +120,8 @@ export default {
     handleJoin (index, row) {
       console.log(index, row)
     },
-    handleCheck (index, row) {
-      console.log(index, row)
+    handleCheck (id) {
+      this.$router.push('/show_article/' + id)
     },
     handleSizeChange (val) {
       this.limit = val
@@ -101,6 +131,9 @@ export default {
     handleCurrentChange (val) {
       this.offset = val
       this.getClubList()
+    },
+    reply (id) {
+
     }
   }
 }
