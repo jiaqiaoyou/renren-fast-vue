@@ -2,20 +2,11 @@
   <div v-loading.fullscreen.lock="loading" element-loading-text="拼命加载中">
     <div>
       <el-form>
-        <el-form-item @keyup.enter.native="submit">
-          <el-tag>标题</el-tag>
-          <el-input v-model="dataForm.name" @change="this.$forceUpdate"/>
-        </el-form-item>
-
-        <el-form-item>
-          <el-tag>正文</el-tag>
-          <div id="demo1"></div>
-        </el-form-item>
 
         <el-form-item>
           <el-tag>社团标签</el-tag>
           <br>
-          <el-select v-model="clubs" multiple placeholder="请选择">
+          <el-select v-model="clubs" multiple placeholder="请选择" filterable="true">
             <el-option
               v-for="club in club_options"
               :key="club.id"
@@ -25,6 +16,15 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item @keyup.enter.native="submit">
+          <el-tag>标题</el-tag>
+          <el-input v-model="dataForm.name" @change="this.$forceUpdate"/>
+        </el-form-item>
+
+        <el-form-item>
+          <el-tag>正文</el-tag>
+          <div id="demo1"></div>
+        </el-form-item>
 
         <el-form-item>
           <el-button type="primary" @click="submit()">编辑</el-button>

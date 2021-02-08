@@ -8,11 +8,19 @@ import '@/icons'                              // api: http://www.iconfont.cn/
 import '@/element-ui-theme'
 import '@/assets/scss/index.scss'
 import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/axios
-import { isAuth } from '@/utils'
+import {isAuth} from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
-
+import VueSocketIO from 'vue-socket.io'
 
 Vue.use(VueCookie)
+// Vue.use(new VueSocketIO({
+//   debug: true,
+//   connection: 'http://127.0.0.1:8001',
+//   vuex: {
+//     store
+//   },
+//   options: {path: '/proxyPoll/'},
+// }))
 Vue.config.productionTip = false
 
 // 非生产环境, 适配mockjs模拟数据                 // api: https://github.com/nuysoft/Mock
@@ -33,5 +41,19 @@ new Vue({
   router,
   store,
   template: '<App/>',
-  components: { App }
+  components: {App},
+  sockets: {
+    connect: function () {
+      console.log('socket connected')
+    },
+    customEmit: function (data) {
+      console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
+    }
+  },
+  methods: {
+    clickButton: function (data) {
+      // $socket is socket.io-client instance
+      this.$socket.emit('emit_method', data)
+    }
+  }
 })

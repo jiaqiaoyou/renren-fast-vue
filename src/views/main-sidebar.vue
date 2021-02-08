@@ -50,6 +50,7 @@
           </el-menu-item>
           <el-menu-item index="msg-mine" @click="$router.push({name:'my_message_receive'})">
             <span>已接收</span>
+            <span style="color: red" v-if="!this.readall">（有未读）</span>
           </el-menu-item>
           <el-menu-item index="msg-mine" @click="$router.push({name:'my_message_send'})">
             <span>已发送</span>
@@ -90,7 +91,13 @@ import {clearLoginInfo} from '../utils'
 export default {
   data () {
     return {
-      dynamicMenuRoutes: []
+      alarm: false,
+      timer: '',
+      websocketobj: null,
+      wsHeartflag: false,
+      reconnectTime: 0,
+      dynamicMenuRoutes: [],
+      readall: undefined
     }
   },
   components: {
@@ -125,7 +132,9 @@ export default {
     },
     mainTabs: {
       get () {
-        return this.$store.state.common.mainTabs
+        this.$http({
+          url: this.$http.adornUrl()
+        })
       },
       set (val) {
         this.$store.commit('common/updateMainTabs', val)
@@ -144,29 +153,89 @@ export default {
     $route: 'routeHandle'
   },
   created () {
+    // this.testwebsocket()
+    // this.initWebSocket()
     this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
     this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
     this.routeHandle(this.$route)
   },
+  mounted () {
+    this.timer = setInterval(this.get, 1000)
+  },
+  beforeDestroy () {
+    clearInterval(this.timer)
+  },
+  // sockets: {
+  //   // connect () {
+  //   //   console.log('socket connected')
+  //   // }
+  // },
   methods: {
-    logoutHandle () {
-      this.$confirm(`确定进行[退出]操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+    get () {
+      this.$http({
+        url: this.$http.adornUrl('user/me'),
+        method: 'get'
+      }).then(({data}) => {
         this.$http({
-          url: this.$http.adornUrl('/user/logout'),
-          method: 'post',
-          data: this.$http.adornData()
+          url: this.$http.adornUrl('/readall/' + data.id),
+          method: 'get'
         }).then(({data}) => {
-          if (data && data.code === 200) {
-            clearLoginInfo()
-            this.$router.push({name: 'login'})
-          }
+          this.readall = data.readall
         })
-      }).catch(() => {
       })
+    },
+    // testwebsocket () {
+    //   console.log('before try to connect')
+    //   // sending a connect request to the server.
+    //   var socket = io.connect('http://localhost:4999')
+    //   console.log('after connect')
+    //   console.log(socket)
+    //   socket.on('after connect', function (msg) {
+    //     console.log('After connect', msg)
+    //   })
+    // },
+    initWebSocket () {
+      console.log('before new')
+      this.websocketobj = new WebSocket(
+        'ws://127.0.0.1:4999/'
+      )
+      console.log('after new')
+      this.websocketobj.onmessage = this.onmessage
+      this.websocketobj.onopen = this.onopen
+      this.websocketobj.onerror = this.onerror
+      this.websocketobj.onclose = this.onclose
+    },
+    onmessage (evt) {
+      console.log(evt)
+    },
+    onopen () {
+      console.log('open')
+    },
+    onclose () {
+      console.log('close')
+    },
+    onerror (err) {
+      console.log(err)
+    },
+    logoutHandle () {
+      this.$http({
+        url: this.$http.adornUrl('/user/logout'),
+        method: 'post',
+        data: this.$http.adornData()
+      }).then(({data}) => {
+        if (data && data.code === 200) {
+          clearLoginInfo()
+          this.$router.push({name: 'login'})
+        }
+      })
+      // this.$confirm(`确定进行[退出]操作?`, '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(() => {
+      //
+      // }).catch(() => {
+      // })
     },
     // 路由操作
     routeHandle (route) {

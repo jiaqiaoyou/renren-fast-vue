@@ -2,6 +2,20 @@
   <div v-loading.fullscreen.lock="loading" element-loading-text="拼命加载中">
     <div>
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submit()" status-icon>
+
+        <el-form-item>
+          <el-tag>社团标签</el-tag>
+          <br>
+          <el-select v-model="clubs" multiple placeholder="请选择" filterable>
+            <el-option
+              v-for="club in club_options"
+              :key="club.id"
+              :label="club.name"
+              :value="club.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item prop="name">
           <el-tag>标题</el-tag>
           <el-input placeholder="请输入文章标题"
@@ -12,19 +26,6 @@
         <el-form-item prop="context">
           <el-tag>正文</el-tag>
           <div id="demo1"></div>
-        </el-form-item>
-
-        <el-form-item>
-          <el-tag>社团标签</el-tag>
-          <br>
-          <el-select v-model="clubs" multiple placeholder="请选择">
-            <el-option
-              v-for="club in club_options"
-              :key="club.id"
-              :label="club.name"
-              :value="club.id">
-            </el-option>
-          </el-select>
         </el-form-item>
 
 
@@ -91,6 +92,7 @@ export default {
           }).then(({data}) => {
             if (data && data.code === 200) {
               this.dataForm = {}
+              this.clubs = []
               this.editor.txt.html('')
               this.$notify.success('创建成功')
               this.$router.push('/show_article_list/?me=1')

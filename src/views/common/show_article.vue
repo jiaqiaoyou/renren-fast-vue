@@ -33,24 +33,18 @@
       <br><br>
 
       <div v-model="dataForm">
-        <el-tag>文章正文</el-tag>
-        <el-card>
-          <p v-html="dataForm.context"></p>
-        </el-card>
-      </div>
-      <br><br>
-
-      <div v-model="dataForm">
-        <el-tag>更多</el-tag>
+        <el-tag>操作</el-tag>
         <el-card>
           <el-button type="primary"
                      size="mini"
-                     @click="handleEdit">
+                     @click="handleEdit"
+                     v-if="my_article">
             编辑文章
           </el-button>
           <el-button type="danger"
                      size="mini"
-                     @click="delete_confirm=true">
+                     @click="delete_confirm=true"
+                     v-if="my_article">
             删除文章
           </el-button>
           <el-button type="primary"
@@ -66,12 +60,23 @@
           </el-button>
         </el-card>
       </div>
+      <br><br>
+
+      <div v-model="dataForm">
+        <el-tag>文章正文</el-tag>
+        <el-card>
+          <p v-html="dataForm.context"></p>
+        </el-card>
+      </div>
+      <br><br>
+
     </template>
   </div>
 </template>
 
 <script>
 export default {
+
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.getDataList()
@@ -82,14 +87,20 @@ export default {
   },
   data () {
     return {
+      my_article: '',
       delete_confirm: false,
       out_confirm: false,
-      loading: false,
+      loading: true,
       id: undefined,
       dataForm: {}
     }
   },
   methods: {
+    clear () {
+      console.log('leaving')
+      this.my_article = ''
+      this.dataForm = {}
+    },
     handleEdit () {
       this.$router.push('/edit_article/' + this.$route.params.id)
     },
@@ -105,6 +116,7 @@ export default {
       })
     },
     getDataList () {
+      this.loading = true
       this.id = this.$route.params.id
       this.$http({
         url: this.$http.adornUrl('/article/' + this.id),
@@ -112,7 +124,15 @@ export default {
       }).then(({data}) => {
         if (data && data.code === 200) {
           this.dataForm = data
-          this.loading = false
+          this.$http({
+            url: this.$http.adornUrl('/user/me'),
+            method: 'get'
+          }).then(({data}) => {
+            if (data && data.code === 200) {
+              this.my_article = (this.dataForm.owner.id === data.id)
+              this.loading = false
+            }
+          })
         }
       })
     },

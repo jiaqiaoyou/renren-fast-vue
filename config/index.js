@@ -19,6 +19,13 @@ module.exports = {
         pathRewrite: {
           '^/proxyApi': '/'
         }
+      },
+      '/proxyPoll':{
+        target: 'http://127.0.0.1:4999/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/proxyPoll': '/'
+        }
       }
     },
 

@@ -2,6 +2,19 @@
   <div v-loading.fullscreen.lock="loading" element-loading-text="拼命加载中">
     <template v-if="!loading">
 
+      <div>
+        <el-form :inline="true" @keypress.enter="ambigious_search">
+          <el-form-item>
+            <el-tag>社团名称</el-tag>
+            <el-input v-model="search_club" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <br>
+            <el-button @click="ambigious_search" type="danger">筛选查询</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
       <el-dialog
         title="提示"
         :visible.sync="delete_success_visible"
@@ -86,10 +99,32 @@ export default {
       loading: true,
       offset: 1,
       limit: 10,
-      total: undefined
+      total: undefined,
+      search_name: '',
+      search_owner: '',
+      search_club: ''
     }
   },
   methods: {
+    ambigious_search () {
+      this.$http({
+        url: this.$http.adornUrl('/club'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'search_club': this.search_club,
+          'search_owner': this.search_owner,
+          'me': 1
+        })
+      }).then(({data}) => {
+        console.log(data)
+        if (data && data.code === 200) {
+          console.log(data)
+          this.loading = false
+          this.tableData = data.clubs
+          this.total = data.total
+        }
+      })
+    },
     getClubList () {
       this.$http({
         url: this.$http.adornUrl('/club'),

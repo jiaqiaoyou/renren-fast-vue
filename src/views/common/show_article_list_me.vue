@@ -11,7 +11,7 @@
           <el-form-item>
             <el-tag>社团标签</el-tag>
             <br>
-            <el-select v-model="search_club" placeholder="请选择" clearable>
+            <el-select v-model="search_club" placeholder="请选择" clearable filterable>
               <el-option
                 v-for="club in club_options"
                 :key="club.id"

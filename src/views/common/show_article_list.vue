@@ -15,7 +15,7 @@
           <el-form-item>
             <el-tag>社团标签</el-tag>
             <br>
-            <el-select v-model="search_club" placeholder="请选择" clearable>
+            <el-select v-model="search_club" placeholder="请选择" clearable filterable>
               <el-option
                 v-for="club in club_options"
                 :key="club.id"
@@ -90,11 +90,13 @@
 export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
+      vm.getUsers()
       vm.getAllClubs()
       vm.getArticleList()
     })
   },
   created () {
+    this.getUsers()
     this.getAllClubs()
     this.getArticleList()
   },
@@ -121,10 +123,27 @@ export default {
       offset: 1,
       limit: 10,
       total: undefined,
-      club_options: []
+      club_options: [],
+      user_options: []
     }
   },
   methods: {
+    getUsers () {
+      this.$http({
+        url: this.$http.adornUrl('/user'),
+        method: 'get',
+        params: this.$http.adornParams({
+          'limit': 50,
+          'offset': 1,
+          'me': 0
+        })
+      }).then(({data}) => {
+        if (data && data.code === 200) {
+          this.loading = false
+          this.user_options = data
+        }
+      })
+    },
     getAllClubs () {
       this.$http({
         url: this.$http.adornUrl('/club'),
@@ -145,6 +164,20 @@ export default {
     getArticleList () {
       this.search_name = this.$route.query.name
       this.search_owner = this.$route.query.owner
+      // eslint-disable-next-line camelcase
+      let club_tag = this.$route.query.clubs
+      // eslint-disable-next-line camelcase
+      if (club_tag) {
+        this.$http({
+          // eslint-disable-next-line camelcase
+          url: this.$http.adornUrl('/club/' + club_tag),
+          method: 'get',
+        }).then(({data}) => {
+          this.search_club = data.name
+        })
+      }
+      console.log(this.limit)
+      console.log(this.offset)
       this.search_club = this.$route.query.clubs
       this.$http({
         url: this.$http.adornUrl('/article'),
@@ -200,8 +233,10 @@ export default {
       this.getClubList()
     },
     handleCurrentChange (val) {
-      this.offset = val
-      this.getClubList()
+      console.log(val)
+      console.log(this.offset)
+      this.offset = (val - 1) * this.limit + 1
+      this.getArticleList()
     }
   }
 }

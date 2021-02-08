@@ -13,6 +13,16 @@
       </el-dialog>
 
       <el-dialog
+        title="申请理由"
+        :visible.sync="this.join_reason"
+        width="30%">
+        <el-input type="textarea" v-model="reason" :autosize="{minRows:5,maxRows:10}"></el-input>
+        <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="handleIn">确定</el-button>
+        </span>
+      </el-dialog>
+
+      <el-dialog
         title="警告"
         :visible.sync="this.dismiss_confirm"
         width="30%">
@@ -145,7 +155,7 @@
         <el-card>
           <el-button type="primary"
                      size="medium"
-                     v-if="managing"
+                     v-if="managing||owning"
                      @click="handleEdit">
             编辑社团信息
           </el-button>
@@ -162,14 +172,14 @@
           </el-button>
           <el-button type="danger"
                      size="medium"
-                     v-if="membering"
+                     v-if="managing||membering"
                      @click="out_confirm=true">
             退出社团
           </el-button>
           <el-button type="primary"
                      size="medium"
-                     v-if="!membering"
-                     @click="handleIn()">
+                     v-if="!membering&&!owning&&!managing"
+                     @click="join_reason=true">
             申请加入
           </el-button>
         </el-card>
@@ -217,7 +227,8 @@ export default {
           {required: true, message: '社团名称不能为空', trigger: blur}
         ]
       },
-      reason: ''
+      reason: '',
+      join_reason: false
     }
   },
   methods: {
@@ -308,7 +319,7 @@ export default {
     },
     handleArticle () {
       this.id = this.$route.params.id
-      this.$router.push('/show_article_list/?clubs='+this.$route.params.id)
+      this.$router.push('/show_article_list/?clubs=' + this.$route.params.id)
     },
     handleDismiss () {
       this.$http({
@@ -345,7 +356,6 @@ export default {
         // eslint-disable-next-line camelcase
         let join_name = data.name
         // eslint-disable-next-line camelcase
-        let join_id = data.id
         this.$http(
           {
             url: this.$http.adornUrl('/msg'),
@@ -354,22 +364,13 @@ export default {
               'school_numbers': this.dataForm.owner.school_number,
               // eslint-disable-next-line camelcase
               'name': '用户 "' + join_name + '"' + ' 申请加入社团 ' + '"' + this.dataForm.name + '"',
-              'context':
-                '<i>用户的申请理由如下:</i>' +
-                '<br><br>' +
-                '<h3>' +
-                this.reason +
-                '</h3>' +
-                '<br><br>' +
-                // eslint-disable-next-line camelcase
-                '<a v-if="canAgree" href="/#/add_member/' + this.dataForm.id + '/?join_id=' + join_id + '"> <h2>同意</h2> </a>' +
-                // eslint-disable-next-line camelcase
-                '<a v-if="canAgree" href="/#/add_member/' + this.dataForm.id + '/?join_id=' + join_id + '"> <h2>拒绝</h2> </a>' +
-                '<br>' +
-                '<i> *注：如不同意，请勿点击同意并将理由回复于此邮件</i>',
+              'context': this.reason,
+              'join_id': this.dataForm.id
             }
           }
         ).then(({data}) => {
+          this.join_reason = false
+          this.reason = ''
           this.$notify.success('申请已发送，请等候管理员的同意')
         })
       })

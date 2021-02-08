@@ -1,7 +1,6 @@
 <template>
   <div v-loading.fullscreen.lock="this.loading" element-loading-text="拼命加载中">
     <template v-if="!this.loading">
-
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm">
         <el-form-item prop="school_number">
           <el-tag>学号</el-tag>
